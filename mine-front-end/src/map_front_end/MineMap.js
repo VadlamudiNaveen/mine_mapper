@@ -21,7 +21,7 @@ const MineMap = () => {
 
   // Fetch the mine locations from the backend
   useEffect(() => {
-    fetch("http://localhost:8083/locations")
+    fetch("http://localhost:8083/mines")
       .then((response) => response.json())
       .then((data) => {
         setMines(data); // Store the data in state

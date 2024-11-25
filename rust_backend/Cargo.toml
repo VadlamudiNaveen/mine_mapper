@@ -1,0 +1,22 @@
+#![feature(error_in_core)]
+
+[package]
+name = "mines-backend"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+
+[dependencies]
+actix-web = { version = "=4.0" }
+actix-cors = { version = "=0.6" }
+serde = { version = "=1.0", features = ["derive"] }
+serde_json = { version = "=1.0" }
+sqlx = { version = "=0.6.3", features = ["runtime-actix-native-tls", "mysql", "chrono"] }
+tokio = { version = "=1.30.0", features = ["full"] }
+chrono = { version = "=0.4.28", features = ["serde"] }
+dotenvy = { version = "=0.15" }
+env_logger = { version = "=0.10" }
+log = { version = "=0.4" }
+idna = { version = "=1.0.2" }
+
+
