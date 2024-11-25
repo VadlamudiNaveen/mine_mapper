@@ -1,128 +1,117 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-
+import React, { useState } from "react";
+import { TextField, Button, Box, Grid, CircularProgress, Typography, Alert } from "@mui/material";
+import axios from "axios";
 
 const MineInfoForm = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    operationStartDate: '',
-    latitude: null,
-    longitude: null
+    name: "",
+    description: "",
+    operationStartDate: "",
+    latitude: "",
+    longitude: "",
   });
-
-  const handleLocationChange = (latitude, longitude) => {
-    setFormData((prev) => ({
-      ...prev,
-      latitude: parseFloat(latitude), // Convert string to float if needed
-      longitude: parseFloat(longitude)
-    }));
-  };
-  
-  
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [responseMessage, setResponseMessage] = useState('');
+  const [responseMessage, setResponseMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setResponseMessage("");
+    setErrorMessage("");
 
     try {
-      // Replace `/api/mines` with your backend endpoint
-      const response = await axios.post('http://localhost:8083/mines', {
+      const response = await axios.post("http://localhost:8083/mines", {
         name: formData.name,
         description: formData.description,
         operation_start_date: formData.operationStartDate,
-        latitude: formData.latitude,
-        longitude: formData.longitude
+        latitude: parseFloat(formData.latitude),
+        longitude: parseFloat(formData.longitude),
       });
-
-      console.log(response);
-      setResponseMessage('Data submitted successfully!');
+      setResponseMessage("Data submitted successfully!");
     } catch (error) {
-      console.error(error);
-      setResponseMessage('Error submitting data. Please try again.');
+      setErrorMessage("Error submitting data. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="mine-info-form">
-      <h2>Submit Mine Information</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="name">Mine Name:</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
+    <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+      <TextField
+        label="Mine Name"
+        name="name"
+        value={formData.name}
+        onChange={handleChange}
+        required
+        fullWidth
+      />
+      <TextField
+        label="Description"
+        name="description"
+        value={formData.description}
+        onChange={handleChange}
+        required
+        fullWidth
+        multiline
+        rows={4}
+      />
+      <TextField
+        label="Operation Start Date"
+        type="date"
+        name="operationStartDate"
+        value={formData.operationStartDate}
+        onChange={handleChange}
+        required
+        fullWidth
+        InputLabelProps={{ shrink: true }}
+      />
+
+      {/* Latitude and Longitude Fields Side by Side */}
+      <Grid container spacing={2}>
+        <Grid item xs={6}>
+          <TextField
+            label="Latitude"
+            name="latitude"
+            type="number"
+            value={formData.latitude}
             onChange={handleChange}
             required
+            fullWidth
           />
-        </div>
-
-        <div>
-          <label htmlFor="description">Description:</label>
-          <textarea
-            id="description"
-            name="description"
-            value={formData.description}
+        </Grid>
+        <Grid item xs={6}>
+          <TextField
+            label="Longitude"
+            name="longitude"
+            type="number"
+            value={formData.longitude}
             onChange={handleChange}
             required
-          ></textarea>
-        </div>
-
-        <div>
-          <label htmlFor="operationStartDate">Operation Start Date:</label>
-          <input
-            type="date"
-            id="operationStartDate"
-            name="operationStartDate"
-            value={formData.operationStartDate}
-            onChange={handleChange}
-            required
+            fullWidth
           />
-        </div>
+        </Grid>
+      </Grid>
 
-        <div>
-      <div>
-        <label htmlFor="latitude">Latitude:</label>
-        <input
-  type="number"
-  placeholder="Latitude"
-  value={formData.latitude || ''}
-  onChange={(e) => handleLocationChange(e.target.value, formData.longitude)}
-/>
+      {isSubmitting ? (
+        <CircularProgress />
+      ) : (
+        <Button variant="contained" color="primary" type="submit" fullWidth>
+          Submit
+        </Button>
+      )}
 
-        <label htmlFor="longitude">Longitude:</label>
-
-
-<input
-  type="number"
-  placeholder="Longitude"
-  value={formData.longitude || ''}
-  onChange={(e) => handleLocationChange(formData.latitude, e.target.value)}
-/>
-
-
-      </div>
-    </div>
-
-        <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Submitting...' : 'Submit'}
-        </button>
-      </form>
-      {responseMessage && <p>{responseMessage}</p>}
-    </div>
+      {responseMessage && <Alert severity="success">{responseMessage}</Alert>}
+      {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+    </Box>
   );
 };
 
